@@ -13,7 +13,9 @@
     <!-- Add EJS code here -->
     <h3>My Amazing URLs</h3>
     <% for(var keys in urls) { %>
-    <p> <%= keys %> , <%= urls[keys] %> </p>
+    <ul>
+        <li><b><%= keys %>: </b><%= urls[keys] %></li>
+    </ul>
     <% } %>
 
 </body>
