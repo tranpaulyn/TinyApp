@@ -11,10 +11,8 @@
 <% include partials/_header.ejs %>
 <body style="font-size:20px; padding:50px;">
     <!-- Add EJS code here -->
-    <h3>My Amazing URLs</h3>
-    <% for(var keys in urls) { %>
-    <p> <%= keys %> , <%= urls[keys] %> </p>
-    <% } %>
-
+    <h3>Tiny URL for <%= longURL %> </h3>    
+    <p> <%= shortURL %> </p>
+        
 </body>
 </html>
