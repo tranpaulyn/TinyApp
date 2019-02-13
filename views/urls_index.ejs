@@ -15,7 +15,7 @@
     <h3>My Amazing URLs</h3>
     <% for(var keys in urls) { %>
     <ul>
-        <li><b><%= keys %>: </b><%= urls[keys] %></li>
+        <li><b><a href="<%= urls[keys] %>"><%= keys %></a>: </b><%= urls[keys] %></li>
     </ul>
     <% } %>
 
