@@ -14,11 +14,15 @@
     <!-- Add EJS code here -->
     <h3>Tiny URLs</h3>
     <% for(var keys in urls) { %>
-    <ul>
-        <li style = "list-style-type: none;" ><b><a href="<%= urls[keys] %>"><%= keys %></a>: </b><%= urls[keys] %> 
-            <form  method="POST" action="/urls/<%= keys %>/delete">
-                <button type="submit" class="btn btn-primary">Delete</button></form></li>
-    </ul>
+    <div class="row">
+        <div class="col" style="padding-top: 10px;">
+        <form  method="POST" action="/urls/<%= keys %>/delete">
+            <b><a href="<%= urls[keys] %>"><%= keys %></a>: </b><%= urls[keys] %> 
+            <a class="btn btn-outline-primary" href="/urls/<%= keys %>">Edit</a>
+            <button type="submit" class="btn btn-primary">Delete</button>
+        </form>
+        </div>
+    </div>
     <% } %>
 
 </body>
