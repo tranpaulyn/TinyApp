@@ -162,7 +162,7 @@ app.post('/register', (req, res) => {
     console.log(emailLookup(userEmail));
     // If empty strings are passed, redirect to error page
     if (userEmail === '' || userPW === '' || emailLookup(userEmail) ) {
-        res.redirect('/error');
+        res.redirect('/error400');
     } else {
         usersDB[newUser] = {
             id: newUser, 
@@ -175,14 +175,23 @@ app.post('/register', (req, res) => {
     }
 });
 
-// Error Page
-app.get('/error', (req, res) => {
+// Error Page 400
+app.get('/error400', (req, res) => {
     const templateVars = { 
         username: req.cookies.user_id,
         email: usersDB[req.cookies['user_id']],
     }
-    res.render('urls_error', templateVars)
-})
+    res.render('urls_error400', templateVars)
+});
+
+// Error Page 403
+app.get('/error403', (req, res) => {
+    const templateVars = { 
+        username: req.cookies.user_id,
+        email: usersDB[req.cookies['user_id']],
+    }
+    res.render('urls_error403', templateVars)
+});
 
 // Login Page
 app.get('/login', (req, res) => {
@@ -206,7 +215,7 @@ app.post('/login', (req, res) => {
         res.redirect('/urls')
     // If empty strings are passed or email does not match redirect to error page
     } else {
-        res.redirect('/error');
+        res.redirect('/error403');
     } console.log(usersDB)
 });
 
