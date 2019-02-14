@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col" style="padding-top: 10px;">
         <form  method="POST" action="/urls/<%= keys %>/delete">
-            <b><a href="<%= urls[keys] %>"><%= keys %></a>: </b><%= urls[keys] %> 
+            <b><a target="_blank" href="<%= urls[keys] %>"><%= keys %></a>: </b><%= urls[keys] %> 
             <a class="btn btn-outline-primary" href="/urls/<%= keys %>">Edit</a>
             <button type="submit" class="btn btn-primary">Delete</button>
         </form>
