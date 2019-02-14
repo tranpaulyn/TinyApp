@@ -1,6 +1,20 @@
 var express = require("express");
+var cookieParser = require('cookie-parser');
 var app = express();
+const bodyParser = require("body-parser");
+
 var PORT = 8080; // default port 8080
+
+app.use(bodyParser.urlencoded({extended: true}));
+//Cookie Business
+app.post('/login', (req, res) => {
+    // set a cookie named username to the value submitted 
+    // in the request body via the login form
+    // // after the server has set the cookie, redirect to the /urls
+    res.cookie("username", req.body.username)
+    res.redirect('/urls');
+});
+
 
 // this tells the Express app to use EJS as its templating engine
 app.set("view engine", "ejs"); 
@@ -10,8 +24,6 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
 
 app.get("/", (req, res) => {
   res.send("Hello!");
