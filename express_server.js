@@ -5,19 +5,10 @@ const bodyParser = require("body-parser");
 
 var PORT = 8080; // default port 8080
 
-app.use(bodyParser.urlencoded({extended: true}));
-//Cookie Business
-app.post('/login', (req, res) => {
-    // set a cookie named username to the value submitted 
-    // in the request body via the login form
-    // // after the server has set the cookie, redirect to the /urls
-    res.cookie("username", req.body.username)
-    res.redirect('/urls');
-});
-
 
 // this tells the Express app to use EJS as its templating engine
 app.set("view engine", "ejs"); 
+app.use(bodyParser.urlencoded({extended: true}));
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -38,11 +29,17 @@ app.listen(PORT, () => {
 });
 
 app.get("/urls", (req, res) => {
-    let templateVars = { urls: urlDatabase };
+    let templateVars = { 
+        // username: req.cookies["username"],
+        urls: urlDatabase
+};
     res.render("urls_index", templateVars)
 });
 
 app.get("/urls/new", (req, res) => {
+    // let templateVars = {
+    //     username: req.cookies["username"]
+    // }
     res.render("urls_new");
 });
 
@@ -55,6 +52,18 @@ function generateRandomString() {
   
     return text;
 }
+
+//Cookie Business
+app.post('/login', (req, res) => {
+    // set a cookie named username to the value submitted 
+    // in the request body via the login form
+    // // after the server has set the cookie, redirect to the /urls
+    console.log(req.body)
+    res.cookie("username", req.body.username)
+    // display the username
+    // res.render("urls_index", templateVars);
+    res.redirect('/urls');
+});
 
 app.post("/urls", (req, res) => {
     // console.log(req.body);  // Log the POST request body to the console
