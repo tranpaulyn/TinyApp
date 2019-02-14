@@ -9,6 +9,7 @@ var PORT = 8080; // default port 8080
 // this tells the Express app to use EJS as its templating engine
 app.set("view engine", "ejs"); 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -31,24 +32,15 @@ app.listen(PORT, () => {
 app.get("/urls", (req, res) => {
     let templateVars = {
         urls: urlDatabase,
-        username: ""
-    }
-    if (req.cookies === undefined) {
-        templateVars = {
-            urls: urlDatabase,
-            username: ""
-        }
-    } else {
-    templateVars = { 
-        username: req.cookies["username"],
-        urls: urlDatabase}
-    }
+        username: req.cookies.username };
     res.render("urls_index", templateVars)
 });
 
 
 app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
+    let templateVars = {
+        username: req.cookies.username };
+    res.render("urls_new", templateVars)
 });
 
 function generateRandomString() {
@@ -66,7 +58,7 @@ app.post('/login', (req, res) => {
     // set a cookie named username to the value submitted 
     // in the request body via the login form
     // // after the server has set the cookie, redirect to the /urls
-    // console.log(req.body)
+    console.log(req.body)
     res.cookie("username", req.body.username)
     res.redirect('/urls');
 });
@@ -82,7 +74,8 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
     let templateVars = { shortURL: req.params.shortURL, 
-        longURL: urlDatabase[req.params.shortURL]};
+        longURL: urlDatabase[req.params.shortURL],
+        username: req.cookies.username };
     res.render("urls_show", templateVars);
 });
 
