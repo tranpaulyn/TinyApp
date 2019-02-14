@@ -65,24 +65,12 @@ app.post('/urls', (req, res) => {
     res.redirect('/urls/' + newShortURL)
 });
 
-//Cookie Business -- create a cookie
-app.post('/login', (req, res) => {
-    res.cookie('user_id', req.body.username)
-    res.redirect('/urls');
-});
-
-// Clear Cookie & Logout
-app.post('/logout', (req, res) => {
-    res.clearCookie('user_id')
-    res.redirect('/urls');
-});
-
 
 // Short URL Page - can edit/update on this page
 app.get('/urls/:shortURL', (req, res) => {
     let templateVars = { shortURL: req.params.shortURL, 
         longURL: urlDatabase[req.params.shortURL],
-        email: usersDB[req.cookies['used_id']],
+        email: usersDB[req.cookies['user_id']],
         username: req.cookies.user_id };
     res.render('urls_show', templateVars);
 });
@@ -148,6 +136,23 @@ function emailLookup(email) {
         }
     } 
 }
+// PW lookup function
+function passwordCheck(password) {
+    for (var id in usersDB) {
+        if (password === usersDB[id].password) {
+            return true
+        }
+    }
+}
+
+// Find User ID
+function userIdCheck(email) {
+    for (var id in usersDB) {
+        if (email === usersDB[id].email) {
+            return id
+        }
+    }
+}
 
 // Registration Handler
 app.post('/register', (req, res) => {
@@ -178,3 +183,35 @@ app.get('/error', (req, res) => {
     }
     res.render('urls_error', templateVars)
 })
+
+// Login Page
+app.get('/login', (req, res) => {
+    // we need these for the header
+    const templateVars = {
+        email: usersDB[req.cookies['user_id']],
+        username: req.cookies.user_id 
+    }; 
+    res.render('urls_login', templateVars)
+});
+
+// Login Page Handler
+app.post('/login', (req, res) => {
+    // const newUser = generateRandomUserID();
+    const userEmail = req.body.email;
+    const userPW = req.body.password;
+    console.log(emailLookup(userEmail));
+    // Check email and password match
+    if (emailLookup(userEmail) && passwordCheck(userPW)) {
+        res.cookie('user_id', userIdCheck(userEmail))
+        res.redirect('/urls')
+    // If empty strings are passed or email does not match redirect to error page
+    } else {
+        res.redirect('/error');
+    } console.log(usersDB)
+});
+
+// Clear Cookie & Logout
+app.post('/logout', (req, res) => {
+    res.clearCookie('user_id')
+    res.redirect('/urls');
+});
