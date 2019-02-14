@@ -1,34 +1,39 @@
 <header>
-    <div class ="row">
-        <div class="col" style="margin-bottom: 100px;">
-            <h1>Tiny App</h1>
-            <a href="/urls/new">Create New Tiny URL</a>
-        </div>
-        <div class="col" style="display: block">
-            <!-- // If logged in -->
-            <% if (email) {%>
-            <form method="post" action="/logout">
-                <p>You are logged in as <%= email.email %>
-                <button style="margin-left: 10px;" type="Submit" class="btn btn-primary"> Logout </button>
-                </p>
-            </form>
-            <!-- If Logged Out -->
-            <% } else { %>
-            <div class="row">
-                <div class="col">
-                    <form method="post" action="/login">
-                    <input class="form-control" type="text" name="email" placeholder="Email" value="">
-                    </div>
-                <div class ="col">
-                        <input class="form-control" type="password" name="password" placeholder="Password" value="">
+    <!-- If Logged In -->
+    <% if (email) {%>
+        <div class ="row">
+                <div class="col" style="margin-bottom: 100px;">
+                    <h1>Tiny App</h1>
+                    <a href="/urls/new">Create New Tiny URL</a>
                 </div>
-                <div class="col">
-                    <button type="Submit" class="btn btn-primary"> Login </button>
+                <div class="col" style="display: block">
+                    <% if (email) {%>
+                    <form method="post" action="/logout">
+                        <p>You are logged in as <%= email.email %>
+                        <button type="Submit" class="btn btn-primary"> Logout </button>
+                        </p>
+                    </form>
                 </div>
+            </div>
+    <% } %>
+    <!-- If Logged Out -->
+    <% } else { %>
+        <div class ="row">
+            <div class="col" style="margin-bottom: 100px;">
+                <h1>Tiny App</h1>
+            </div>
+            <div class="col">
+                <form method="post" action="/login">
+                <input class="form-control" type="text" name="email" placeholder="Email" value="">
+            </div>
+            <div class ="col">
+                <input class="form-control" type="password" name="password" placeholder="Password" value="">
+            </div>
+            <div class="col">
+                <button type="Submit" class="btn btn-primary"> Login </button>
+            </div>
                 </form>
             </div>
             <% } %>
-        </div>
-        </div>
-    </div>
+
 </header>
