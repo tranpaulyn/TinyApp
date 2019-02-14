@@ -4,14 +4,26 @@
             <h1>Tiny App</h1>
             <a href="/urls/new">Create New Tiny URL</a>
         </div>
-        <div class="col">
+        <div class="col" style="display: block">
+            <!-- // If logged in -->
             <% if (username) {%>
-            <p>You are logged in as <%= username %></p>
-            <% } else { %>
-            <form method="post" action="/login">
-            <input class="form-control" type="text" name="username" placeholder="Username" value="">
-            <button style="margin-top:5px; float: right; font-size: 12px" type="Submit" class="btn btn-primary"> Login </button>
+            <form method="post" action="/logout">
+                <p>You are logged in as <%= username %>
+                <button style="margin-left: 10px;" type="Submit" class="btn btn-primary"> Logout </button>
+                </p>
             </form>
+            <!-- If Logged Out -->
+            <% } else { %>
+            <div class="row">
+                <div class="col">
+                    <form method="post" action="/login">
+                    <input class="form-control" type="text" name="username" placeholder="Username" value="">
+                    </div>
+                <div class="col">
+                    <button type="Submit" class="btn btn-primary"> Login </button>
+                </div>
+                </form>
+            </div>
             <% } %>
         </div>
         </div>
