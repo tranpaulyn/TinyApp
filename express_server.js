@@ -29,17 +29,25 @@ app.listen(PORT, () => {
 });
 
 app.get("/urls", (req, res) => {
-    let templateVars = { 
-        // username: req.cookies["username"],
-        urls: urlDatabase
-};
+    let templateVars = {
+        urls: urlDatabase,
+        username: ""
+    }
+    if (req.cookies === undefined) {
+        templateVars = {
+            urls: urlDatabase,
+            username: ""
+        }
+    } else {
+    templateVars = { 
+        username: req.cookies["username"],
+        urls: urlDatabase}
+    }
     res.render("urls_index", templateVars)
 });
 
+
 app.get("/urls/new", (req, res) => {
-    // let templateVars = {
-    //     username: req.cookies["username"]
-    // }
     res.render("urls_new");
 });
 
@@ -58,10 +66,8 @@ app.post('/login', (req, res) => {
     // set a cookie named username to the value submitted 
     // in the request body via the login form
     // // after the server has set the cookie, redirect to the /urls
-    console.log(req.body)
+    // console.log(req.body)
     res.cookie("username", req.body.username)
-    // display the username
-    // res.render("urls_index", templateVars);
     res.redirect('/urls');
 });
 
