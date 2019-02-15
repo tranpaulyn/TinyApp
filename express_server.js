@@ -95,14 +95,17 @@ app.get('/u/:shortURL', (req, res) => {
 
 // Delete Short URL
 app.post('/urls/:shortURL/delete', (req, res) => {
-    delete urlDatabase[req.params.shortURL];
+    if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
+        delete urlDatabase[req.params.shortURL];
+    }
     res.redirect('/urls');
 });
 
 // Updates Short URL in the database
 app.post('/urls/:shortURL/update', (req, res) => {
-    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-    console.log(urlDatabase);
+    if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
+        urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+    }
     res.redirect('/urls');
 })
 
