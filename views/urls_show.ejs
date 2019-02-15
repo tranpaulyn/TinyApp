@@ -15,15 +15,16 @@
     <!-- Add EJS code here -->
     <h3>ShortURL: <a target="_blank" href="<%= urls[shortURL].longURL %>"><%= shortURL %></a> </h3>    
     
+    <form method="POST" action="/urls/<%= shortURL %>/update">
         <div class="row">
             <div class="col">
                 <input class="form-control" type="text" name="longURL" placeholder="<%= urls[shortURL].longURL %>">
             </div>
             <div class="col">
-                <form name="longURL" method="POST" action="/urls/<%= shortURL %>/update"> <button type="submit" class="btn btn-primary">Update</button> </form>
+                 <button type="submit" class="btn btn-primary">Update</button> 
             </div>
         </div>
-    
+    </form>
     <br>
     <p>
         <a href="/urls">Go Home</a>
