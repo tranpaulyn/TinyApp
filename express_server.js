@@ -11,7 +11,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-var urlDatabase = {
+const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com'
 };
@@ -60,7 +60,11 @@ function generateRandomString() {
 // Create New Tiny URL & Add to URL Datbase
 app.post('/urls', (req, res) => {
     const newShortURL = generateRandomString();
-    urlDatabase[newShortURL] = req.body.longURL;
+    const userID = req.cookies.user_id;
+    urlDatabase[newShortURL] = {
+        longURL: req.body.longURL,
+        userID: userID
+    };
     console.log(urlDatabase);
     res.redirect('/urls/' + newShortURL)
 });
