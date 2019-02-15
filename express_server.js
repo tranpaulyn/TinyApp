@@ -11,7 +11,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-var urlDatabase = {
+const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com'
 };
@@ -33,8 +33,10 @@ app.listen(PORT, () => {
 app.get('/urls', (req, res) => {
     let templateVars = {
         urls: urlDatabase,
+        cookie: req.cookies.user_id,
         email: usersDB[req.cookies['user_id']],
-        username: req.cookies.user_id };
+        username: req.cookies.user_id,
+        longURL: req.body.longURL };
     res.render('urls_index', templateVars)
 });
 
@@ -60,24 +62,34 @@ function generateRandomString() {
 // Create New Tiny URL & Add to URL Datbase
 app.post('/urls', (req, res) => {
     const newShortURL = generateRandomString();
-    urlDatabase[newShortURL] = req.body.longURL;
+    const userID = req.cookies.user_id;
+    urlDatabase[newShortURL] = {
+        longURL: req.body.longURL,
+        userID: userID
+    };
     console.log(urlDatabase);
     res.redirect('/urls/' + newShortURL)
 });
 
+// Function that returns the URLS where the userID is equal to the id of currently logged in user
+
 
 // Short URL Page - can edit/update on this page
 app.get('/urls/:shortURL', (req, res) => {
-    let templateVars = { shortURL: req.params.shortURL, 
-        longURL: urlDatabase[req.params.shortURL],
+    let templateVars = { 
+        urls: urlDatabase,
+        shortURL: req.params.shortURL,
+        cookie: req.cookies.user_id,
         email: usersDB[req.cookies['user_id']],
-        username: req.cookies.user_id };
+        username: req.cookies.user_id
+    };
     res.render('urls_show', templateVars);
 });
 
+
 // Link short url to long URL
 app.get('/u/:shortURL', (req, res) => {
-    const longURL = urlDatabase[req.params.shortURL];
+    const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
 });
 
@@ -89,7 +101,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 // Updates Short URL in the database
 app.post('/urls/:shortURL/update', (req, res) => {
-    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+    urlDatabase[req.params.shortURL].longURL = req.params.longURL;
+    console.log(urlDatabase);
     res.redirect('/urls');
 })
 
