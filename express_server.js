@@ -1,7 +1,8 @@
-var express = require('express');
-var cookieParser = require('cookie-parser');
-var app = express();
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const app = express();
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt'); 
 
 var PORT = 8080; // default port 8080
 
@@ -175,7 +176,7 @@ app.post('/register', (req, res) => {
     const newUser = generateRandomUserID();
     const userEmail = req.body.email;
     const userPW = req.body.password;
-    console.log(emailLookup(userEmail));
+    const hashedPassword = bcrypt.hashSync(userPW, 10);
     // If empty strings are passed, redirect to error page
     if (userEmail === '' || userPW === '' || emailLookup(userEmail) ) {
         res.redirect('/error400');
@@ -183,7 +184,7 @@ app.post('/register', (req, res) => {
         usersDB[newUser] = {
             id: newUser, 
             email: userEmail,
-            password: userPW
+            password: hashedPassword
         }
         console.log(usersDB);
         res.cookie('user_id', newUser)
@@ -224,9 +225,10 @@ app.post('/login', (req, res) => {
     // const newUser = generateRandomUserID();
     const userEmail = req.body.email;
     const userPW = req.body.password;
+    const hashedPassword = bcrypt.hashSync(userPW, 10);
     console.log(emailLookup(userEmail));
     // Check email and password match
-    if (emailLookup(userEmail) && passwordCheck(userPW)) {
+    if (emailLookup(userEmail) && bcrypt.compareSync(userPW, hashedPassword)) {
         res.cookie('user_id', userIdCheck(userEmail))
         res.redirect('/urls')
     // If empty strings are passed or email does not match redirect to error page
