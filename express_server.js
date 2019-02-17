@@ -146,7 +146,7 @@ const usersDB = {
 // Registration Page
 app.get('/register', (req, res) => {
     const templateVars = {
-        email: usersDB[req.session['user_id']],
+        email: usersDB[req.cookies['user_id']],
         username: req.session.user_id // we need this for header login
     };
     res.render('urls_register', templateVars)
@@ -203,7 +203,7 @@ app.post('/register', (req, res) => {
 app.get('/error400', (req, res) => {
     const templateVars = { 
         username: req.session.user_id,
-        email: usersDB[req.session['user_id']],
+        email: usersDB[req.cookies['user_id']],
     }
     res.render('urls_error400', templateVars)
 });
@@ -212,7 +212,7 @@ app.get('/error400', (req, res) => {
 app.get('/error403', (req, res) => {
     const templateVars = { 
         username: req.session.user_id,
-        email: usersDB[req.session['user_id']],
+        email: usersDB[req.cookies['user_id']],
     }
     res.render('urls_error403', templateVars)
 });
@@ -221,7 +221,7 @@ app.get('/error403', (req, res) => {
 app.get('/login', (req, res) => {
     // we need these for the header
     const templateVars = {
-        email: usersDB[req.session['user_id']],
+        email: usersDB[req.cookies['user_id']],
         username: req.session.user_id 
     }; 
     res.render('urls_login', templateVars)
