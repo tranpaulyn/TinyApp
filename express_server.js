@@ -100,7 +100,11 @@ app.get('/urls/:shortURL', (req, res) => {
         email: usersDB[req.cookies['user_id']],
         username: req.session.user_id
     };
-    res.render('urls_show', templateVars);
+    if (req.params.shortURL === true) {
+        res.render('urls_show', templateVars);
+    } else {
+        res.redirect('/error404');
+    }
 });
 
 
