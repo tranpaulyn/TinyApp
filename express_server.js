@@ -1,8 +1,9 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt'); 
+const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session');
 
 var PORT = 8080; // default port 8080
 
@@ -10,7 +11,13 @@ var PORT = 8080; // default port 8080
 // this tells the Express app to use EJS as its templating engine
 app.set('view engine', 'ejs'); 
 app.use(bodyParser.urlencoded({extended: true}));
+
 app.use(cookieParser());
+
+app.use(cookieSession({
+    name: 'session',
+    keys: ['randomString']
+}));
 
 const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
@@ -34,9 +41,9 @@ app.listen(PORT, () => {
 app.get('/urls', (req, res) => {
     let templateVars = {
         urls: urlDatabase,
-        cookie: req.cookies.user_id,
+        cookie: req.session.user_id,
         email: usersDB[req.cookies['user_id']],
-        username: req.cookies.user_id,
+        username: req.session.user_id,
         longURL: req.body.longURL };
     res.render('urls_index', templateVars)
 });
@@ -45,7 +52,7 @@ app.get('/urls', (req, res) => {
 app.get('/urls/new', (req, res) => {
     let templateVars = {
         email: usersDB[req.cookies['user_id']],
-        username: req.cookies.user_id };
+        username: req.session.user_id };
     res.render('urls_new', templateVars)
 });
 
@@ -63,7 +70,7 @@ function generateRandomString() {
 // Create New Tiny URL & Add to URL Datbase
 app.post('/urls', (req, res) => {
     const newShortURL = generateRandomString();
-    const userID = req.cookies.user_id;
+    const userID = req.session.user_id;
     urlDatabase[newShortURL] = {
         longURL: req.body.longURL,
         userID: userID
@@ -80,9 +87,9 @@ app.get('/urls/:shortURL', (req, res) => {
     let templateVars = { 
         urls: urlDatabase,
         shortURL: req.params.shortURL,
-        cookie: req.cookies.user_id,
+        cookie: req.session.user_id,
         email: usersDB[req.cookies['user_id']],
-        username: req.cookies.user_id
+        username: req.session.user_id
     };
     res.render('urls_show', templateVars);
 });
@@ -96,7 +103,7 @@ app.get('/u/:shortURL', (req, res) => {
 
 // Delete Short URL
 app.post('/urls/:shortURL/delete', (req, res) => {
-    if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
+    if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
         delete urlDatabase[req.params.shortURL];
     }
     res.redirect('/urls');
@@ -104,7 +111,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 // Updates Short URL in the database
 app.post('/urls/:shortURL/update', (req, res) => {
-    if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
+    if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
         urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     }
     res.redirect('/urls');
@@ -139,8 +146,8 @@ const usersDB = {
 // Registration Page
 app.get('/register', (req, res) => {
     const templateVars = {
-        email: usersDB[req.cookies['user_id']],
-        username: req.cookies.user_id // we need this for header login
+        email: usersDB[req.session['user_id']],
+        username: req.session.user_id // we need this for header login
     };
     res.render('urls_register', templateVars)
 });
@@ -187,7 +194,7 @@ app.post('/register', (req, res) => {
             password: hashedPassword
         }
         console.log(usersDB);
-        res.cookie('user_id', newUser)
+        req.session.user_id = 'some random value';
         res.redirect('/urls');
     }
 });
@@ -195,8 +202,8 @@ app.post('/register', (req, res) => {
 // Error Page 400
 app.get('/error400', (req, res) => {
     const templateVars = { 
-        username: req.cookies.user_id,
-        email: usersDB[req.cookies['user_id']],
+        username: req.session.user_id,
+        email: usersDB[req.session['user_id']],
     }
     res.render('urls_error400', templateVars)
 });
@@ -204,8 +211,8 @@ app.get('/error400', (req, res) => {
 // Error Page 403
 app.get('/error403', (req, res) => {
     const templateVars = { 
-        username: req.cookies.user_id,
-        email: usersDB[req.cookies['user_id']],
+        username: req.session.user_id,
+        email: usersDB[req.session['user_id']],
     }
     res.render('urls_error403', templateVars)
 });
@@ -214,8 +221,8 @@ app.get('/error403', (req, res) => {
 app.get('/login', (req, res) => {
     // we need these for the header
     const templateVars = {
-        email: usersDB[req.cookies['user_id']],
-        username: req.cookies.user_id 
+        email: usersDB[req.session['user_id']],
+        username: req.session.user_id 
     }; 
     res.render('urls_login', templateVars)
 });
