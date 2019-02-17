@@ -93,18 +93,14 @@ app.post('/urls', (req, res) => {
 
 // Short URL Page - can edit/update on this page
 app.get('/urls/:shortURL', (req, res) => {
-    let templateVars = { 
-        urls: urlDatabase,
-        shortURL: req.params.shortURL,
-        cookie: req.session.user_id,
-        email: usersDB[req.cookies['user_id']],
-        username: req.session.user_id
-    };
-    if (req.params.shortURL === true) {
-        res.render('urls_show', templateVars);
-    } else {
-        res.redirect('/error404');
-    }
+        let templateVars = { 
+            urls: urlDatabase,
+            shortURL: req.params.shortURL,
+            cookie: req.session.user_id,
+            email: usersDB[req.cookies['user_id']],
+            username: req.session.user_id
+        };
+        res.render('urls_show', templateVars);    
 });
 
 
@@ -125,6 +121,15 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     }
     res.redirect('/urls');
 });
+
+app.get('/urls/:shortURL/delete', (req, res) => {
+    if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+        delete urlDatabase[req.params.shortURL];
+        res.redirect('/urls');
+    } else {
+        res.redirect('/error404')
+    }
+})
 
 // Updates Short URL in the database
 app.post('/urls/:shortURL/update', (req, res) => {
