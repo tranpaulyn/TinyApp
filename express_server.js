@@ -76,9 +76,15 @@ function generateRandomString() {
 app.post('/urls', (req, res) => {
     const newShortURL = generateRandomString();
     const userID = req.session.user_id;
+    let today = new Date();
+    let dd = today.getDate();
+    let mm = today.getMonth() + 1; 
+    let yyyy = today.getFullYear();
+    today = mm + '/' + dd + '/' + yyyy;
     urlDatabase[newShortURL] = {
         longURL: req.body.longURL,
-        userID: userID
+        userID: userID,
+        date: today
     };
     console.log(urlDatabase);
     res.redirect('/urls/' + newShortURL)
