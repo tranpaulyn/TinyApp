@@ -79,8 +79,6 @@ app.post('/urls', (req, res) => {
     res.redirect('/urls/' + newShortURL)
 });
 
-// Function that returns the URLS where the userID is equal to the id of currently logged in user
-
 
 // Short URL Page - can edit/update on this page
 app.get('/urls/:shortURL', (req, res) => {
@@ -152,22 +150,7 @@ app.get('/register', (req, res) => {
     res.render('urls_register', templateVars)
 });
 
-// Email Lookup Helper Function 
-function emailLookup(email) {
-    for (var id in usersDB) {
-        if (email === usersDB[id].email) {
-            return true
-        }
-    } 
-}
-// PW lookup function
-function passwordCheck(password) {
-    for (var id in usersDB) {
-        if (password === usersDB[id].password) {
-            return true
-        }
-    }
-}
+
 
 // Find User ID
 function userIdCheck(email) {
@@ -195,6 +178,7 @@ app.post('/register', (req, res) => {
         }
         console.log(usersDB);
         req.session.user_id = 'some random value';
+        res.cookie('user_id', userIdCheck(userEmail))
         res.redirect('/urls');
     }
 });
@@ -227,6 +211,22 @@ app.get('/login', (req, res) => {
     res.render('urls_login', templateVars)
 });
 
+// PW lookup function
+function passwordCheck(userPW) {
+    const hashedPassword = bcrypt.hashSync(userPW, 10);
+    if (bcrypt.compareSync(userPW, hashedPassword)) {
+        return true;
+    }
+}
+// Email Lookup Helper Function 
+function emailLookup(email) {
+    for (var id in usersDB) {
+        if (email === usersDB[id].email) {
+            return true
+        }
+    } 
+}
+
 // Login Page Handler
 app.post('/login', (req, res) => {
     // const newUser = generateRandomUserID();
@@ -235,17 +235,22 @@ app.post('/login', (req, res) => {
     const hashedPassword = bcrypt.hashSync(userPW, 10);
     console.log(emailLookup(userEmail));
     // Check email and password match
-    if (emailLookup(userEmail) && bcrypt.compareSync(userPW, hashedPassword)) {
+    if (emailLookup(userEmail) && userPW === '') {
+        res.redirect('/error403');
+    } else if (emailLookup(userEmail) && bcrypt.compareSync(userPW, hashedPassword)) {
         res.cookie('user_id', userIdCheck(userEmail))
+        req.session.user_id = "some value"
         res.redirect('/urls')
-    // If empty strings are passed or email does not match redirect to error page
     } else {
         res.redirect('/error403');
     } console.log(usersDB)
 });
 
+
+
 // Clear Cookie & Logout
 app.post('/logout', (req, res) => {
+    req.session = null;
     res.clearCookie('user_id')
     res.redirect('/urls');
 });

@@ -14,7 +14,7 @@
     <!-- Add EJS code here -->
     <% if (email) {%>
             <% for(var keys in urls) { %>
-                <% if (urls[keys].userID === username) { %>
+                <% if (urls[keys].userID === cookie) { %>
                     <div class="row">
                         <div class="col" style="padding-top: 10px;">
                         <form  method="POST" action="/urls/<%= keys %>/delete">
