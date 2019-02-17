@@ -106,8 +106,12 @@ app.get('/urls/:shortURL', (req, res) => {
 
 // Link short url to long URL
 app.get('/u/:shortURL', (req, res) => {
-    const longURL = urlDatabase[req.params.shortURL].longURL;
-    res.redirect(longURL);
+    if (req.params.shortURL === true) {
+        const longURL = urlDatabase[req.params.shortURL].longURL;
+        res.redirect(longURL);
+    } else {
+        res.redirect('/error404');
+    }
 });
 
 // Delete Short URL
@@ -210,6 +214,15 @@ app.get('/error403', (req, res) => {
         username: req.session.user_id ,
     }
     res.render('urls_error403', templateVars)
+});
+
+// Error Page 404
+app.get('/error404', (req, res) => {
+    const templateVars = { 
+        email: usersDB[req.cookies['user_id']],
+        username: req.session.user_id ,
+    }
+    res.render('urls_error404', templateVars)
 });
 
 // Login Page
