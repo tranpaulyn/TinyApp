@@ -197,8 +197,8 @@ app.post('/register', (req, res) => {
 // Error Page 400
 app.get('/error400', (req, res) => {
     const templateVars = { 
-        username: req.session.user_id,
-        email: usersDB[req.session['user_id']],
+        email: usersDB[req.cookies['user_id']],
+        username: req.session.user_id
     }
     res.render('urls_error400', templateVars)
 });
@@ -206,8 +206,8 @@ app.get('/error400', (req, res) => {
 // Error Page 403
 app.get('/error403', (req, res) => {
     const templateVars = { 
-        username: req.session.user_id,
-        email: usersDB[req.session['user_id']],
+        email: usersDB[req.cookies['user_id']],
+        username: req.session.user_id ,
     }
     res.render('urls_error403', templateVars)
 });
