@@ -12,8 +12,6 @@ This project was built on an HTTP Server and handles requests from the browser (
 !["Screenshot of Homepage (logged in) with populated list of short URLs"](https://github.com/tranpaulyn/TinyApp/blob/master/docs/TinyApp_URLsShow.png)
 
 
-
-
 ## Dependencies
 
 - Node.js
@@ -28,4 +26,4 @@ This project was built on an HTTP Server and handles requests from the browser (
 - Install all dependencies (using the `npm install` command).
 - Run the development webserver using the `node express_server.js` command
 - Open your browser and input http://localhost:8080/
-- Register to begin shortening URLs!
+- Register an account to begin shortening URLs!
