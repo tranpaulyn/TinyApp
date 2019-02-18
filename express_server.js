@@ -271,8 +271,6 @@ app.post('/login', (req, res) => {
     }
 });
 
-
-
 // Clear Cookie & Logout
 app.post('/logout', (req, res) => {
     req.session = null;
