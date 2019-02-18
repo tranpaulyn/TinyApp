@@ -24,14 +24,13 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.com'
 };
 
-
+// Root URL with proper redirects
 app.get('/', (req, res) => {
     if (req.session.user_id) {
         res.redirect('/urls');
     } else {
         res.redirect('/login');
     }
-
 });
 
 app.get('/hello', (req, res) => {
@@ -50,7 +49,7 @@ app.get('/urls', (req, res) => {
         email: usersDB[req.cookies['user_id']],
         username: req.session.user_id,
         longURL: req.body.longURL };
-    res.render('urls_index', templateVars)
+    res.render('urls_index', templateVars);
 });
 
 //Create New Tiny URL Page
@@ -58,19 +57,17 @@ app.get('/urls/new', (req, res) => {
     let templateVars = {
         email: usersDB[req.cookies['user_id']],
         username: req.session.user_id };
-    res.render('urls_new', templateVars)
+    res.render('urls_new', templateVars);
 });
 
 //Generate random string to create new tiny URL
 function generateRandomString() {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  
     for (var i = 0; i < 6; i++)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
-  
     return text;
-}
+};
 
 // Create New Tiny URL & Add to URL Datbase
 app.post('/urls', (req, res) => {
@@ -87,7 +84,7 @@ app.post('/urls', (req, res) => {
         date: today
     };
     console.log(urlDatabase);
-    res.redirect('/urls/' + newShortURL)
+    res.redirect('/urls/' + newShortURL);
 });
 
 
@@ -127,7 +124,7 @@ app.get('/urls/:shortURL/delete', (req, res) => {
         delete urlDatabase[req.params.shortURL];
         res.redirect('/urls');
     } else {
-        res.redirect('/error404')
+        res.redirect('/error404');
     }
 })
 
@@ -144,10 +141,8 @@ app.post('/urls/:shortURL/update', (req, res) => {
 function generateRandomUserID() {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  
     for (var i = 0; i < 6; i++)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
-  
     return text;
 }
 
@@ -167,14 +162,13 @@ const usersDB = {
 
 // Registration Page
 app.get('/register', (req, res) => {
+    // we need this for header login
     const templateVars = {
         email: usersDB[req.session['user_id']],
-        username: req.session.user_id // we need this for header login
+        username: req.session.user_id 
     };
-    res.render('urls_register', templateVars)
+    res.render('urls_register', templateVars);
 });
-
-
 
 // Find User ID
 function userIdCheck(email) {
@@ -185,35 +179,13 @@ function userIdCheck(email) {
     }
 }
 
-// Registration Handler
-app.post('/register', (req, res) => {
-    const newUser = generateRandomUserID();
-    const userEmail = req.body.email;
-    const userPW = req.body.password;
-    const hashedPassword = bcrypt.hashSync(userPW, 10);
-    // If empty strings are passed, redirect to error page
-    if (userEmail === '' || userPW === '' || emailLookup(userEmail) ) {
-        res.redirect('/error400');
-    } else {
-        usersDB[newUser] = {
-            id: newUser, 
-            email: userEmail,
-            password: hashedPassword
-        }
-        console.log(usersDB);
-        req.session.user_id = 'some random value';
-        res.cookie('user_id', userIdCheck(userEmail))
-        res.redirect('/urls');
-    }
-});
-
 // Error Page 400
 app.get('/error400', (req, res) => {
     const templateVars = { 
         email: usersDB[req.cookies['user_id']],
         username: req.session.user_id
     }
-    res.render('urls_error400', templateVars)
+    res.render('urls_error400', templateVars);
 });
 
 // Error Page 403
@@ -222,7 +194,7 @@ app.get('/error403', (req, res) => {
         email: usersDB[req.cookies['user_id']],
         username: req.session.user_id ,
     }
-    res.render('urls_error403', templateVars)
+    res.render('urls_error403', templateVars);
 });
 
 // Error Page 404
@@ -231,7 +203,7 @@ app.get('/error404', (req, res) => {
         email: usersDB[req.cookies['user_id']],
         username: req.session.user_id ,
     }
-    res.render('urls_error404', templateVars)
+    res.render('urls_error404', templateVars);
 });
 
 // Login Page
@@ -241,42 +213,62 @@ app.get('/login', (req, res) => {
         email: usersDB[req.session['user_id']],
         username: req.session.user_id 
     }; 
-    res.render('urls_login', templateVars)
+    res.render('urls_login', templateVars);
 });
 
-// PW lookup function
-function passwordCheck(userPW) {
-    const hashedPassword = bcrypt.hashSync(userPW, 10);
-    if (bcrypt.compareSync(userPW, hashedPassword)) {
-        return true;
-    }
-}
 // Email Lookup Helper Function 
 function emailLookup(email) {
     for (var id in usersDB) {
         if (email === usersDB[id].email) {
-            return true
+            return true;
         }
     } 
 }
+
+// Registration Handler
+app.post('/register', (req, res) => {
+    const newUser = generateRandomUserID();
+    const userEmail = req.body.email;
+    const userPW = req.body.password;
+    let hashedPassword = bcrypt.hashSync(userPW, 10);
+    // If empty strings are passed, redirect to error page
+    if (userEmail === '' || userPW === '' || emailLookup(userEmail)) {
+        res.redirect('/error400');
+    } else {
+        usersDB[newUser] = {
+            id: newUser, 
+            email: userEmail,
+            password: hashedPassword
+        }
+        console.log(usersDB);
+        req.session.user_id = 'some random value';
+        res.cookie('user_id', userIdCheck(userEmail));
+        res.redirect('/urls');
+    }
+});
+
 
 // Login Page Handler
 app.post('/login', (req, res) => {
     // const newUser = generateRandomUserID();
     const userEmail = req.body.email;
     const userPW = req.body.password;
-    const hashedPassword = bcrypt.hashSync(userPW, 10);
-    console.log(emailLookup(userEmail));
+    let userID = userIdCheck(userEmail);
+    let hashedPassword = usersDB[userID].password
     // Check email and password match
-    if (emailLookup(userEmail) && userPW === '') {
+    if (!userEmail || userEmail === "" && !userPW || userPW === "") {
         res.redirect('/error403');
-    } else if (emailLookup(userEmail) && bcrypt.compareSync(userPW, hashedPassword)) {
-        res.cookie('user_id', userIdCheck(userEmail))
-        req.session.user_id = "some value"
-        res.redirect('/urls')
+    } else if (emailLookup(userEmail)) {
+        if (bcrypt.compareSync(userPW, hashedPassword)) {
+            res.cookie('user_id', userIdCheck(userEmail));
+            req.session.user_id = 'some value';
+            res.redirect('/urls')
+        } else {
+            res.redirect('/error403');
+        }
     } else {
         res.redirect('/error403');
-    } console.log(usersDB)
+    }
 });
 
 
@@ -284,6 +276,6 @@ app.post('/login', (req, res) => {
 // Clear Cookie & Logout
 app.post('/logout', (req, res) => {
     req.session = null;
-    res.clearCookie('user_id')
+    res.clearCookie('user_id');
     res.redirect('/urls');
 });
