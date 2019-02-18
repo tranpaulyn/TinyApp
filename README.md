@@ -6,7 +6,13 @@ This project was built on an HTTP Server and handles requests from the browser (
 
 ## Final Product
 
-! [] (#)
+!["Screenshot of Homepage (Not logged In)"](https://github.com/tranpaulyn/TinyApp/blob/master/docs/TinyApp_Home.png)
+!["Screenshot of Registration Form"](https://github.com/tranpaulyn/TinyApp/blob/master/docs/TinyApp_Register.png)
+!["Screenshot of Updating a Short URL"](https://github.com/tranpaulyn/TinyApp/blob/master/docs/TinyApp_ShortURLUpdate.png)
+!["Screenshot of Homepage (logged in) with populated list of short URLs"](https://github.com/tranpaulyn/TinyApp/blob/master/docs/TinyApp_URLsShow.png)
+
+
+
 
 ## Dependencies
 
