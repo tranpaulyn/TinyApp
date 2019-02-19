@@ -93,9 +93,8 @@ app.get('/urls/:shortURL', (req, res) => {
         let templateVars = { 
             urls: urlDatabase,
             shortURL: req.params.shortURL,
-            cookie: req.session.user_id,
-            email: usersDB[req.cookies['user_id']],
-            username: req.session.user_id
+            userID: urlDatabase[req.params.shortURL].userID,
+            email: req.cookies['user_id']
         };
         res.render('urls_show', templateVars);    
 });
@@ -241,7 +240,7 @@ app.post('/register', (req, res) => {
             password: hashedPassword
         }
         console.log(usersDB);
-        req.session.user_id = 'some random value';
+        req.session.user_id = newUser;
         res.cookie('user_id', userIdCheck(userEmail));
         res.redirect('/urls');
     }

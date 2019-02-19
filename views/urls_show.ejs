@@ -11,7 +11,7 @@
 
 <body style="font-size:20px; padding:50px;">
 <% include partials/_header.ejs %>
-<% if (urls[shortURL].userID === username) { %>
+<% if (urls[shortURL].userID === email) { %>
     <!-- Add EJS code here -->
     <h3>ShortURL: <a target="_blank" href="<%= urls[shortURL].longURL %>"><%= shortURL %></a> </h3>    
     
