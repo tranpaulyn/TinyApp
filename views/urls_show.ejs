@@ -4,6 +4,7 @@
     <!-- Can only update URL if they created it -->
     <% for(var keys in urls) { %>
         <% if (urls[keys].userID === user) { %>
+           
         <h3>ShortURL: <a target="_blank" href="<%= urls[shortURL].longURL %>"><%= shortURL %></a> </h3>    
     
         <form method="POST" action="/urls/<%= shortURL %>/update">
@@ -20,6 +21,7 @@
         <p>
             <a href="/urls">Go Home</a>
         </p>
+        <% break; %>
         <!-- If they did not create the URL -->
         <% } else { %>
             <center>
