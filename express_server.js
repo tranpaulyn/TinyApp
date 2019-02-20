@@ -1,3 +1,4 @@
+// All the requirments 
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -5,7 +6,7 @@ const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session');
 
-var PORT = 8080; // default port 8080
+const PORT = 8080; // default port 8080
 
 
 // this tells the Express app to use EJS as its templating engine
@@ -19,10 +20,14 @@ app.use(cookieSession({
     keys: ['randomString']
 }));
 
-const urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com'
-};
+
+// The Databases
+
+// The URL Database
+const urlDatabase = {};
+
+// Users Database
+const usersDB = {};
 
 // Root URL with proper redirects
 app.get('/', (req, res) => {
@@ -33,13 +38,7 @@ app.get('/', (req, res) => {
     }
 });
 
-app.get('/hello', (req, res) => {
-    res.send('<html><body>Hello <b> World</b></body></html>\n');
-});
-
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
+app.listen(PORT, () => {});
 
 //Home Page -- lists all URLS & login/logout
 app.get('/urls', (req, res) => {
@@ -47,8 +46,10 @@ app.get('/urls', (req, res) => {
         urls: urlDatabase,
         cookie: req.session.user_id,
         email: usersDB[req.cookies['user_id']],
+        user: req.cookies['user_id'],
         username: req.session.user_id,
-        longURL: req.body.longURL };
+        longURL: req.body.longURL 
+    };
     res.render('urls_index', templateVars);
 });
 
@@ -57,6 +58,8 @@ app.get('/urls/new', (req, res) => {
     let templateVars = {
         email: usersDB[req.cookies['user_id']],
         username: req.session.user_id };
+    console.log(usersDB);
+    console.log(urlDatabase)
     res.render('urls_new', templateVars);
 });
 
@@ -64,7 +67,7 @@ app.get('/urls/new', (req, res) => {
 function generateRandomString() {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < 6; i++)
+    for (let i = 0; i < 6; i++)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
 };
@@ -83,7 +86,8 @@ app.post('/urls', (req, res) => {
         userID: userID,
         date: today
     };
-    console.log(urlDatabase);
+    console.log(usersDB);
+    console.log(urlDatabase)
     res.redirect('/urls/' + newShortURL);
 });
 
@@ -92,9 +96,11 @@ app.post('/urls', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
         let templateVars = { 
             urls: urlDatabase,
+            cookie: req.session.user_id,
             shortURL: req.params.shortURL,
-            userID: urlDatabase[req.params.shortURL].userID,
-            email: req.cookies['user_id']
+            email: usersDB[req.cookies['user_id']],
+            user: req.cookies['user_id'],
+            username: req.session.user_id
         };
         res.render('urls_show', templateVars);    
 });
@@ -118,6 +124,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     res.redirect('/urls');
 });
 
+// Only allow user who created URL to delete it and redirect
 app.get('/urls/:shortURL/delete', (req, res) => {
     if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
         delete urlDatabase[req.params.shortURL];
@@ -140,24 +147,10 @@ app.post('/urls/:shortURL/update', (req, res) => {
 function generateRandomUserID() {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < 6; i++)
+    for (let i = 0; i < 6; i++)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
 }
-
-// Users Database
-const usersDB = {
-    'userRandomID': {
-        id: 'userRandomID',
-        email: 'user@example.com',
-        password: 'purple-monkey-dinosaur'
-    },
-    'user2RandomID': {
-        id: 'userRandomID',
-        email: 'user2@example.com',
-        password: 'dishwasher-funk'
-    }
-};
 
 // Registration Page
 app.get('/register', (req, res) => {
@@ -171,7 +164,7 @@ app.get('/register', (req, res) => {
 
 // Find User ID
 function userIdCheck(email) {
-    for (var id in usersDB) {
+    for (let id in usersDB) {
         if (email === usersDB[id].email) {
             return id
         }
@@ -217,7 +210,7 @@ app.get('/login', (req, res) => {
 
 // Email Lookup Helper Function 
 function emailLookup(email) {
-    for (var id in usersDB) {
+    for (let id in usersDB) {
         if (email === usersDB[id].email) {
             return true;
         }
@@ -226,20 +219,20 @@ function emailLookup(email) {
 
 // Registration Handler
 app.post('/register', (req, res) => {
-    const newUser = generateRandomUserID();
-    const userEmail = req.body.email;
+    const newUser = generateRandomUserID(); // Generates random string for new userID
+    const userEmail = req.body.email; // User enters email and desired password
     const userPW = req.body.password;
-    let hashedPassword = bcrypt.hashSync(userPW, 10);
+    let hashedPassword = bcrypt.hashSync(userPW, 10); // Has the new user's password
     // If empty strings are passed, redirect to error page
+    // If email already exists in user database, redirect to error page
     if (userEmail === '' || userPW === '' || emailLookup(userEmail)) {
         res.redirect('/error400');
-    } else {
+    } else { // Successful registration
         usersDB[newUser] = {
             id: newUser, 
             email: userEmail,
             password: hashedPassword
-        }
-        console.log(usersDB);
+        } // Create session cookie after successful registration & redirect to home
         req.session.user_id = newUser;
         res.cookie('user_id', userIdCheck(userEmail));
         res.redirect('/urls');
@@ -254,11 +247,12 @@ app.post('/login', (req, res) => {
     const userPW = req.body.password;
     let userID = userIdCheck(userEmail);
     let hashedPassword = usersDB[userID].password
-    // Check email and password match
+    // Check if email and password match and make sure no empty strings passed
     if (!userEmail || userEmail === "" && !userPW || userPW === "") {
         res.redirect('/error403');
-    } else if (emailLookup(userEmail)) {
+    } else if (emailLookup(userEmail)) { // If email is found is user database, check if password matches
         if (bcrypt.compareSync(userPW, hashedPassword)) {
+            // If email is found and password matches, create hashed cookie and redirect
             res.cookie('user_id', userIdCheck(userEmail));
             req.session.user_id = 'some value';
             res.redirect('/urls')

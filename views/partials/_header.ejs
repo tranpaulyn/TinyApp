@@ -1,4 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <title>TinyApp</title>
+</head>
+
+<body style="font-size:20px; padding:50px;">
+    
 <header>
+
     <!-- If Logged In -->
     <% if (email) {%>
         <div class ="row">
@@ -23,15 +37,13 @@
                 <h1>Tiny App</h1>
             </div>
             <div class="col">
-                <form method="post" action="/login">
-                <input style="margin-top: 10px" class="form-control" type="text" name="email" placeholder="Email" value="">
+
             </div>
             <div class ="col">
-                <input style="margin-top: 10px" class="form-control" type="password" name="password" placeholder="Password" value="">
+
             </div>
             <div class="col">
-                <button style="margin-top: 10px" type="Submit" class="btn btn-primary"> Login </button>
-            </form>
+                <a href="/login"><button style="margin-top: 10px" type="Submit" class="btn btn-primary"> Login </button></a>
                 <a href="/register"><button style="margin-top: 10px" type="Submit" class="btn btn-outline-primary"> Register </button></a>
             </div>
             </div>
