@@ -22,12 +22,48 @@ app.use(cookieSession({
 
 
 // The Databases
-
 // The URL Database
 const urlDatabase = {};
 
 // Users Database
 const usersDB = {};
+
+// The Functions
+//Generate random string to create new tiny URL
+function generateRandomString() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 6; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+};
+
+// Create Random User ID
+function generateRandomUserID() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 6; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+};
+
+// Find User ID
+function userIdCheck(email) {
+    for (let id in usersDB) {
+        if (email === usersDB[id].email) {
+            return id;
+        }
+    }
+};
+
+// Email Lookup Helper Function 
+function emailLookup(email) {
+    for (let id in usersDB) {
+        if (email === usersDB[id].email) {
+            return true;
+        }
+    } 
+};
 
 // Root URL with proper redirects
 app.get('/', (req, res) => {
@@ -58,19 +94,8 @@ app.get('/urls/new', (req, res) => {
     let templateVars = {
         email: usersDB[req.cookies['user_id']],
         username: req.session.user_id };
-    console.log(usersDB);
-    console.log(urlDatabase)
     res.render('urls_new', templateVars);
 });
-
-//Generate random string to create new tiny URL
-function generateRandomString() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 6; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
-};
 
 // Create New Tiny URL & Add to URL Datbase
 app.post('/urls', (req, res) => {
@@ -86,8 +111,6 @@ app.post('/urls', (req, res) => {
         userID: userID,
         date: today
     };
-    console.log(usersDB);
-    console.log(urlDatabase)
     res.redirect('/urls/' + newShortURL);
 });
 
@@ -142,16 +165,6 @@ app.post('/urls/:shortURL/update', (req, res) => {
     res.redirect('/urls');
 })
 
-
-// Create Random User ID
-function generateRandomUserID() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 6; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
-}
-
 // Registration Page
 app.get('/register', (req, res) => {
     // we need this for header login
@@ -161,15 +174,6 @@ app.get('/register', (req, res) => {
     };
     res.render('urls_register', templateVars);
 });
-
-// Find User ID
-function userIdCheck(email) {
-    for (let id in usersDB) {
-        if (email === usersDB[id].email) {
-            return id
-        }
-    }
-}
 
 // Error Page 400
 app.get('/error400', (req, res) => {
@@ -208,15 +212,6 @@ app.get('/login', (req, res) => {
     res.render('urls_login', templateVars);
 });
 
-// Email Lookup Helper Function 
-function emailLookup(email) {
-    for (let id in usersDB) {
-        if (email === usersDB[id].email) {
-            return true;
-        }
-    } 
-}
-
 // Registration Handler
 app.post('/register', (req, res) => {
     const newUser = generateRandomUserID(); // Generates random string for new userID
@@ -239,7 +234,6 @@ app.post('/register', (req, res) => {
     }
 });
 
-
 // Login Page Handler
 app.post('/login', (req, res) => {
     // const newUser = generateRandomUserID();
@@ -255,7 +249,7 @@ app.post('/login', (req, res) => {
             // If email is found and password matches, create hashed cookie and redirect
             res.cookie('user_id', userIdCheck(userEmail));
             req.session.user_id = 'some value';
-            res.redirect('/urls')
+            res.redirect('/urls');
         } else {
             res.redirect('/error403');
         }
