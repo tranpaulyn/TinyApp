@@ -1,7 +1,5 @@
 <% include partials/_header.ejs %>
     <% if (userID === cookie) { %>
-
-    <!-- Add EJS code here -->
     <h3>ShortURL: <a target="_blank" href="<%= urls[shortURL].longURL %>"><%= shortURL %></a> </h3>    
     
     <form method="POST" action="/urls/<%= shortURL %>/update">

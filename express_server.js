@@ -1,3 +1,4 @@
+// All the requirments 
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -24,12 +25,14 @@ app.use(cookieSession({
 
 /* The Databases */
 // URL Database
+
 const urlDatabase = {};
 
 // Users Database
 const usersDB = {};
 
-/* Functions */
+
+// The Functions
 //Generate random string to create new tiny URL
 function generateRandomString() {
     let text = '';
@@ -37,6 +40,33 @@ function generateRandomString() {
     for (var i = 0; i < 6; i++)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
+};
+
+// Create Random User ID
+function generateRandomUserID() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 6; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+};
+
+// Find User ID
+function userIdCheck(email) {
+    for (let id in usersDB) {
+        if (email === usersDB[id].email) {
+            return id;
+        }
+    }
+};
+
+// Email Lookup Helper Function 
+function emailLookup(email) {
+    for (let id in usersDB) {
+        if (email === usersDB[id].email) {
+            return true;
+        }
+    } 
 };
 
 // Create Random User ID
@@ -73,8 +103,10 @@ app.get('/urls', (req, res) => {
         urls: urlDatabase,
         cookie: req.session.user_id,
         email: usersDB[req.cookies['user_id']],
+        user: req.cookies['user_id'],
         username: req.session.user_id,
-        longURL: req.body.longURL };
+        longURL: req.body.longURL 
+    };
     res.render('urls_index', templateVars);
 });
 
@@ -141,6 +173,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     res.redirect('/urls');
 });
 
+// Only allow user who created URL to delete it and redirect
 app.get('/urls/:shortURL/delete', (req, res) => {
     if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
         delete urlDatabase[req.params.shortURL];
@@ -158,7 +191,6 @@ app.post('/urls/:shortURL/update', (req, res) => {
     res.redirect('/urls');
 })
 
-
 // Registration Page
 app.get('/register', (req, res) => {
     // we need this for header login
@@ -168,7 +200,6 @@ app.get('/register', (req, res) => {
     };
     res.render('urls_register', templateVars);
 });
-
 
 // Error Page 400
 app.get('/error400', (req, res) => {
@@ -207,30 +238,24 @@ app.get('/login', (req, res) => {
     res.render('urls_login', templateVars);
 });
 
-// Email Lookup Helper Function 
-function emailLookup(email) {
-    for (var id in usersDB) {
-        if (email === usersDB[id].email) {
-            return true;
-        }
-    } 
-}
-
 // Registration Handler
 app.post('/register', (req, res) => {
-    const newUser = generateRandomUserID();
-    const userEmail = req.body.email;
+    const newUser = generateRandomUserID(); // Generates random string for new userID
+    const userEmail = req.body.email; // User enters email and desired password
     const userPW = req.body.password;
-    let hashedPassword = bcrypt.hashSync(userPW, 10);
+    let hashedPassword = bcrypt.hashSync(userPW, 10); // Has the new user's password
     // If empty strings are passed, redirect to error page
+    // If email already exists in user database, redirect to error page
     if (userEmail === '' || userPW === '' || emailLookup(userEmail)) {
         res.redirect('/error400');
-    } else {
+    } else { // Successful registration
         usersDB[newUser] = {
             id: newUser, 
             email: userEmail,
             password: hashedPassword
-        }
+
+        } // Create session cookie after successful registration & redirect to home
+
         req.session.user_id = newUser;
         res.cookie('user_id', userIdCheck(userEmail));
         res.redirect('/urls');
@@ -241,7 +266,6 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
     const userEmail = req.body.email;
     const userPW = req.body.password;
-    console.log(userPW)
     let userID = userIdCheck(userEmail);
     // Check email and password match
     if (!userEmail || userEmail === "" || !userPW || userPW === "") {
