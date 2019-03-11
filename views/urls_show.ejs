@@ -1,45 +1,28 @@
 <% include partials/_header.ejs %>
-<!-- If Logged In -->
-<% if (email) {%>
-    <!-- Can only update URL if they created it -->
-    <% for(var keys in urls) { %>
-        <% if (urls[keys].userID === user) { %>
-           
-        <h3>ShortURL: <a target="_blank" href="<%= urls[shortURL].longURL %>"><%= shortURL %></a> </h3>    
+    <% if (userID === cookie) { %>
+    <h3>ShortURL: <a target="_blank" href="<%= urls[shortURL].longURL %>"><%= shortURL %></a> </h3>    
     
-        <form method="POST" action="/urls/<%= shortURL %>/update">
-            <div class="row">
-                <div class="col">
-                    <input class="form-control" type="text" name="longURL" placeholder="<%= urls[shortURL].longURL %>">
-                </div>
-                <div class="col">
-                 <button type="submit" class="btn btn-primary">Update</button> 
-                </div>
+    <form method="POST" action="/urls/<%= shortURL %>/update">
+        <div class="row">
+            <div class="col">
+                <input class="form-control" type="text" name="longURL" placeholder="<%= urls[shortURL].longURL %>">
             </div>
-        </form>
-        <br>
-        <p>
-            <a href="/urls">Go Home</a>
-        </p>
-        <% break; %>
-        <!-- If they did not create the URL -->
-        <% } else { %>
-            <center>
-                <div class="col" style="width: 50%; margin-left: auto; margin-right: auto;">
-                    <h3> You don't have access to this page because you did not create this URL.</h3>
-                    <br>
-                    <p>Go Big & <a href="/urls">Go Home</a>
-                </div>
-            </center>    
-        <% } %>
-    <% } %>
-<!-- If they are not logged in prompt to login or register -->
+            <div class="col">
+                 <button type="submit" class="btn btn-primary">Update</button> 
+            </div>
+        </div>
+    </form>
+    <br>
+    <p>
+        <a href="/urls">Go Home</a>
+    </p>
 <% } else {%>
-    <center>
+
+<center>
         <div class="col" style="width: 50%; margin-left: auto; margin-right: auto;">
-                <h3> You don't have access to this page. Please <a href="/login">Login</a> or <a href="/register">Register</a>. </h3>
+                <h3> You don't have access to this page. </h3>
                 <br>
-            <p>Go Big & <a href="/urls">Go Home</a>
+            <p>Go Big & <a href="/urls">Go Home</a> or <a href="/urls/new">Create Your Own Short URL </a>
         </div>
     </center>    
 <% } %>

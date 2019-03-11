@@ -1,6 +1,6 @@
-<% include partials/_header %>
-<!-- Can only create short URL if they are logged in -->
-  <% if (email) {%>
+    <% include partials/_header %>
+
+    <% if (email) {%>
     <h3>Create TinyURL</h3>
    
     <form class="form-inline" action="/urls" method="POST">
