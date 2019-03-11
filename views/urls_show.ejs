@@ -1,6 +1,5 @@
 <% include partials/_header.ejs %>
-<% for(var keys in urls) { %>
-    <% if (urls[keys].userID === cookie) { %>
+    <% if (userID === cookie) { %>
 
     <!-- Add EJS code here -->
     <h3>ShortURL: <a target="_blank" href="<%= urls[shortURL].longURL %>"><%= shortURL %></a> </h3>    
@@ -19,17 +18,15 @@
     <p>
         <a href="/urls">Go Home</a>
     </p>
-    <% break %>
 <% } else {%>
 
 <center>
         <div class="col" style="width: 50%; margin-left: auto; margin-right: auto;">
                 <h3> You don't have access to this page. </h3>
                 <br>
-            <p>Go Big & <a href="/urls">Go Home</a>
+            <p>Go Big & <a href="/urls">Go Home</a> or <a href="/urls/new">Create Your Own Short URL </a>
         </div>
     </center>    
-<% } %>
 <% } %>
 </body>
 </html>

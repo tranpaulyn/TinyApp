@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session');
 
-var PORT = 8080; // default port 8080
+const PORT = 8080; // default port 8080
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
@@ -38,6 +38,25 @@ function generateRandomString() {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
 };
+
+// Create Random User ID
+function generateRandomUserID() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (var i = 0; i < 6; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+}
+
+// Find User ID
+function userIdCheck(email) {
+    for (var id in usersDB) {
+        if (email === usersDB[id].email) {
+            return id
+        }
+    }
+}
+
 
 // Root URL with proper redirects
 app.get('/', (req, res) => {
@@ -82,37 +101,41 @@ app.post('/urls', (req, res) => {
         userID: userID,
         date: today
     };
-    console.log(urlDatabase);
     res.redirect('/urls/' + newShortURL);
 });
 
 
 // Short URL Page - can edit/update on this page
 app.get('/urls/:shortURL', (req, res) => {
+    if (req.params.shortURL) { // If the short URL exists
         let templateVars = { 
             urls: urlDatabase,
             shortURL: req.params.shortURL,
             userID: urlDatabase[req.params.shortURL].userID,
             cookie: req.session.user_id,
-            email: req.cookies['user_id']
+            email: usersDB[req.cookies['user_id']]
         };
-        res.render('urls_show', templateVars);    
+        res.render('urls_show', templateVars);  
+    }  else { // If it doesn't exist redirect
+        res.redirect('/error404');
+    }
 });
 
 
 // Link short url to long URL
 app.get('/u/:shortURL', (req, res) => {
-    if (req.params.shortURL) {
+    if (req.params.shortURL) { // If the short URL exists
         const longURL = urlDatabase[req.params.shortURL].longURL;
         res.redirect(longURL);
-    } else {
+    } else { // Else redirect
         res.redirect('/error404');
     }
 });
 
 // Delete Short URL
 app.post('/urls/:shortURL/delete', (req, res) => {
-    if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+    // If the user created that URL, only they can delete it
+    if (req.session.user_id === urlDatabase[req.params.shortURL].userID) { 
         delete urlDatabase[req.params.shortURL];
     }
     res.redirect('/urls');
@@ -136,16 +159,6 @@ app.post('/urls/:shortURL/update', (req, res) => {
 })
 
 
-// Create Random User ID
-function generateRandomUserID() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < 6; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
-}
-
-
 // Registration Page
 app.get('/register', (req, res) => {
     // we need this for header login
@@ -156,14 +169,6 @@ app.get('/register', (req, res) => {
     res.render('urls_register', templateVars);
 });
 
-// Find User ID
-function userIdCheck(email) {
-    for (var id in usersDB) {
-        if (email === usersDB[id].email) {
-            return id
-        }
-    }
-}
 
 // Error Page 400
 app.get('/error400', (req, res) => {
@@ -226,13 +231,11 @@ app.post('/register', (req, res) => {
             email: userEmail,
             password: hashedPassword
         }
-        console.log(usersDB);
         req.session.user_id = newUser;
         res.cookie('user_id', userIdCheck(userEmail));
         res.redirect('/urls');
     }
 });
-
 
 // Login Page Handler
 app.post('/login', (req, res) => {
