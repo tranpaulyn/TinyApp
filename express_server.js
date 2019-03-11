@@ -7,21 +7,36 @@ const cookieSession = require('cookie-session');
 
 var PORT = 8080; // default port 8080
 
+app.listen(PORT, () => {
+    console.log(`Example app listening on port ${PORT}!`);
+  });
 
 // this tells the Express app to use EJS as its templating engine
 app.set('view engine', 'ejs'); 
 app.use(bodyParser.urlencoded({extended: true}));
 
+// Cookie Business
 app.use(cookieParser());
-
 app.use(cookieSession({
     name: 'session',
     keys: ['randomString']
 }));
 
-const urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com'
+/* The Databases */
+// URL Database
+const urlDatabase = {};
+
+// Users Database
+const usersDB = {};
+
+/* Functions */
+//Generate random string to create new tiny URL
+function generateRandomString() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (var i = 0; i < 6; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
 };
 
 // Root URL with proper redirects
@@ -31,14 +46,6 @@ app.get('/', (req, res) => {
     } else {
         res.redirect('/login');
     }
-});
-
-app.get('/hello', (req, res) => {
-    res.send('<html><body>Hello <b> World</b></body></html>\n');
-});
-
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
 });
 
 //Home Page -- lists all URLS & login/logout
@@ -60,19 +67,11 @@ app.get('/urls/new', (req, res) => {
     res.render('urls_new', templateVars);
 });
 
-//Generate random string to create new tiny URL
-function generateRandomString() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < 6; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
-};
-
 // Create New Tiny URL & Add to URL Datbase
 app.post('/urls', (req, res) => {
     const newShortURL = generateRandomString();
     const userID = req.session.user_id;
+    // Add Date of Creation
     let today = new Date();
     let dd = today.getDate();
     let mm = today.getMonth() + 1; 
@@ -94,6 +93,7 @@ app.get('/urls/:shortURL', (req, res) => {
             urls: urlDatabase,
             shortURL: req.params.shortURL,
             userID: urlDatabase[req.params.shortURL].userID,
+            cookie: req.session.user_id,
             email: req.cookies['user_id']
         };
         res.render('urls_show', templateVars);    
@@ -145,19 +145,6 @@ function generateRandomUserID() {
     return text;
 }
 
-// Users Database
-const usersDB = {
-    'userRandomID': {
-        id: 'userRandomID',
-        email: 'user@example.com',
-        password: 'purple-monkey-dinosaur'
-    },
-    'user2RandomID': {
-        id: 'userRandomID',
-        email: 'user2@example.com',
-        password: 'dishwasher-funk'
-    }
-};
 
 // Registration Page
 app.get('/register', (req, res) => {
@@ -249,18 +236,18 @@ app.post('/register', (req, res) => {
 
 // Login Page Handler
 app.post('/login', (req, res) => {
-    // const newUser = generateRandomUserID();
     const userEmail = req.body.email;
     const userPW = req.body.password;
+    console.log(userPW)
     let userID = userIdCheck(userEmail);
-    let hashedPassword = usersDB[userID].password
     // Check email and password match
-    if (!userEmail || userEmail === "" && !userPW || userPW === "") {
+    if (!userEmail || userEmail === "" || !userPW || userPW === "") {
         res.redirect('/error403');
     } else if (emailLookup(userEmail)) {
+    let hashedPassword = usersDB[userID].password
         if (bcrypt.compareSync(userPW, hashedPassword)) {
             res.cookie('user_id', userIdCheck(userEmail));
-            req.session.user_id = 'some value';
+            req.session.user_id = usersDB[userID].id;
             res.redirect('/urls')
         } else {
             res.redirect('/error403');
